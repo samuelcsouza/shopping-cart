@@ -31,9 +31,7 @@ public class Product {
     	this.description = description;
     }
     
-    public Product() {
-    	
-    }
+    public Product() {}
     
     /**
      * Retorna o código da produto.

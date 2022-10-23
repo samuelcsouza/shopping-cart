@@ -49,8 +49,7 @@ public class Item {
 		this.quantity = quantity;
     }
     
-    public Item() {
-    }
+    public Item() {}
 
     /**
      * Retorna o produto.

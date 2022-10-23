@@ -6,17 +6,14 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 /**
  * Classe que representa o carrinho de compras de um cliente.
@@ -24,23 +21,12 @@ import javax.persistence.Table;
 @Entity
 public class ShoppingCart {
 	
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
-	}
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long cartId;
 	
+	@Column(name = "clientId")
 	private String clientId;
-
-	public String getClientId() {
-		return clientId;
-	}
-
-	public void setItems(List<Item> items) {
-		this.items = items;
-	}
 
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(
@@ -50,13 +36,17 @@ public class ShoppingCart {
 	)
     private List<Item> items = new ArrayList<>();
     
-    public ShoppingCart() {
-    }
-
+	/**
+	 * Construtor.
+	 * @param clientId
+	 * @param items
+	 */
     public ShoppingCart(String clientId, List<Item> items) {
     	this.clientId = clientId;
 		this.items = items;
 	}
+    
+    public ShoppingCart() {}
 
 	/**
      * Permite a adição de um novo item no carrinho de compras.
@@ -88,7 +78,7 @@ public class ShoppingCart {
      */
     public boolean removeItem(Product product) {
     	
-    	for (Item item : items) {
+    	for (Item item : this.items) {
 			Long productCode = item.getProduct().getCode();
 			
 			if (productCode == product.getCode()) {
@@ -128,7 +118,7 @@ public class ShoppingCart {
     public BigDecimal getAmount() {
     	BigDecimal totalAmount = new BigDecimal(0);
     	
-    	for (Item item : items) {
+    	for (Item item : this.items) {
 			BigDecimal itemAmount = item.getAmount();
 			
 			totalAmount = totalAmount.add(itemAmount);
@@ -145,4 +135,18 @@ public class ShoppingCart {
     public Collection<Item> getItems() {
         return this.items;
     }
+    
+    /* Getters e Setters */
+    
+    public void setClientId(String clientId) {
+		this.clientId = clientId;
+	}
+    
+    public String getClientId() {
+		return clientId;
+	}
+
+	public void setItems(List<Item> items) {
+		this.items = items;
+	}
 }
