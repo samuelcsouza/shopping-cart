@@ -4,11 +4,16 @@ import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import br.com.geofusion.cart.factories.ShoppingCartFactory;
 
 /**
  * Classe que representa um item no carrinho de compras.
@@ -24,15 +29,15 @@ public class Item {
 	@JoinColumn(name = "code")
 	private Product product;
 	
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	@Column(name = "unitPrice")
 	private BigDecimal unitPrice;
 	
 	@Column(name = "quantity")
 	private int quantity;
+	
+	@ManyToOne
+	@JoinColumn(name="clientId", nullable = true)
+	private ShoppingCart shoppingCart;
 
 	/**
      * Construtor da classe Item.
@@ -48,7 +53,6 @@ public class Item {
     }
     
     public Item() {
-    	
     }
 
     /**
@@ -91,5 +95,9 @@ public class Item {
 
 	public Long getId() {
 		return id;
+	}
+	
+	public void setId(Long id) {
+		this.id = id;
 	}
 }
