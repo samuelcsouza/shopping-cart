@@ -30,9 +30,17 @@ public class ProductResource {
 	}
 	
 	@PostMapping
-	public ResponseEntity<Product> save(@RequestBody Product product){
+	public ResponseEntity<Object> save(@RequestBody Product product){
+		
+		Long newProductCode = product.getCode();
+		boolean alreadySaved = this.productRepository.existsById(newProductCode);
+		
+		if (alreadySaved) {
+			return new ResponseEntity<>(new String("The entity already created!"), HttpStatus.CONFLICT);
+		}
 		
 		this.productRepository.save(product);
+		
 		return new ResponseEntity<>(product, HttpStatus.CREATED);
 	}
 	
@@ -45,29 +53,29 @@ public class ProductResource {
 	}
 	
 	@GetMapping(path = "/{id}")
-	public ResponseEntity<Optional<Product>> getById(@PathVariable Long id){
+	public ResponseEntity<Object> getById(@PathVariable Long id){
 		Optional<Product> product;
 		
 		try {
 			product = this.productRepository.findById(id);
 		} catch (NoSuchElementException e) {
-			return new ResponseEntity<Optional<Product>>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new String("Product not found!"), HttpStatus.NOT_FOUND);
 		}
 		
 		if (product.isEmpty())
-			return new ResponseEntity<Optional<Product>>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new String("Product not found!"), HttpStatus.NOT_FOUND);
 		
-		return new ResponseEntity<Optional<Product>>(product, HttpStatus.OK);
+		return new ResponseEntity<>(product, HttpStatus.OK);
 		
 	}
 	
 	@DeleteMapping(path = "/{id}")
-	public ResponseEntity<Optional<Product>> deleteById(@PathVariable Long id){
+	public ResponseEntity<Object> deleteById(@PathVariable Long id){
 		try {
 			this.productRepository.deleteById(id);
-			return new ResponseEntity<Optional<Product>>(HttpStatus.OK);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (NoSuchElementException nsee) {
-			return new ResponseEntity<Optional<Product>>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new String("Product not found!"), HttpStatus.NOT_FOUND);
 		}
 	}
 	
