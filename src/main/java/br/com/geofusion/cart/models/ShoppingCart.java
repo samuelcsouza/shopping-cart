@@ -150,7 +150,12 @@ public class ShoppingCart {
 	}
 
 	private Item getItemByProduct(Product product) {
-		return this.items.stream().filter(obj -> product.equals(obj.getProduct())).findAny().orElse(null);
+		for (Item item : items) {
+			if(product.getCode() == item.getProduct().getCode()) {
+				return item;
+			}
+		}
+		return null;
 	}
 
 	/* Getters e Setters */

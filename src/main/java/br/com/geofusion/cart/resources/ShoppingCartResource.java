@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.geofusion.cart.factories.ShoppingCartFactory;
 import br.com.geofusion.cart.models.Item;
+import br.com.geofusion.cart.models.Product;
 import br.com.geofusion.cart.models.ShoppingCart;
+import br.com.geofusion.cart.repositories.ItemRepository;
+import br.com.geofusion.cart.repositories.ProductRepository;
 import br.com.geofusion.cart.repositories.ShoppingCartRepository;
 
 @RestController
@@ -25,60 +28,57 @@ import br.com.geofusion.cart.repositories.ShoppingCartRepository;
 public class ShoppingCartResource {
 
 	private ShoppingCartFactory factory = new ShoppingCartFactory();
+	private ProductRepository productRepository;
+	private ItemRepository itemRepository;
 
-	public ShoppingCartResource(ShoppingCartRepository shoppingCartRepository) {
+	public ShoppingCartResource(
+			ShoppingCartRepository shoppingCartRepository, 
+			ProductRepository productRepository,
+			ItemRepository itemRepository) 
+	{
 		this.factory.setShoppingCartRepository(shoppingCartRepository);
+		this.productRepository = productRepository;
+		this.itemRepository = itemRepository;
 	}
 
 	@PostMapping
 	public ResponseEntity<ShoppingCart> save(@RequestBody ShoppingCart cart) {
-//		List<ShoppingCart> carts = this.shoppingCartRepository.findAll();
-//		String clientId = cart.getClientId();
-//		
-//		for (ShoppingCart shoppingCart : carts) {
-//			if (shoppingCart.getClientId().equalsIgnoreCase(clientId)) {
-//				return new ResponseEntity<>(shoppingCart, Http)
-//			}
-//		}
-//		
-//		this.shoppingCartRepository.save(cart);
 		ShoppingCart newCart = this.factory.create(cart.getClientId());
 		return new ResponseEntity<>(newCart, HttpStatus.CREATED);
 	}
 
 	@GetMapping
 	public ResponseEntity<List<ShoppingCart>> listAll() {
-//		List<ShoppingCart> carts;
-//		carts = this.shoppingCartRepository.findAll();
 		List<ShoppingCart> allCarts = this.factory.listAll();
 		return new ResponseEntity<>(allCarts, HttpStatus.OK);
 	}
 	
-//	@PatchMapping(path = "/{clientId}")
-//	public ResponseEntity<Object> addItems(@PathVariable String clientId, @RequestBody Item []itens){
-//		ShoppingCart updatedCart = this.factory.updateCart(clientId, itens);
-//		
-//		if(updatedCart == null) {
-//			return new ResponseEntity<>(new String("Cart not found!"), HttpStatus.NOT_FOUND);
-//		}
-//		
-//		return new ResponseEntity<>(updatedCart, HttpStatus.OK);
-//	}
-
-//	@GetMapping(path = "/{id}")
-//	public ResponseEntity<Optional<ShoppingCart>> getById(@PathVariable Long id) {
-//		Optional<ShoppingCart> shoppingCart;
-//
-//		try {
-//			shoppingCart = this.shoppingCartRepository.findById(id);
-//		} catch (Exception e) {
-//			return new ResponseEntity<Optional<ShoppingCart>>(HttpStatus.NOT_FOUND);
-//		}
-//
-//		if (shoppingCart.isEmpty())
-//			return new ResponseEntity<Optional<ShoppingCart>>(HttpStatus.NOT_FOUND);
-//
-//		return new ResponseEntity<Optional<ShoppingCart>>(shoppingCart, HttpStatus.OK);
-//	}
-
+	@PostMapping(path = "/{clientId}")
+	public ResponseEntity<Object> addItem(@PathVariable String clientId, @RequestBody Product product){
+		ShoppingCart clientCart = this.factory.create(clientId);
+		
+		Product productExists = this.productRepository.findById(product.getCode()).orElse(null);
+		if( productExists == null ) {
+			return new ResponseEntity<>(new String("Product not found!"), HttpStatus.NOT_FOUND);
+		}
+		
+		Item itemExists = null;
+		for (Item item : this.itemRepository.findAll()) {
+			if( item.getProduct().getCode() == productExists.getCode() ) {
+				itemExists = item;
+				break;
+			}
+		}
+		
+		if( itemExists == null ) {
+			return new ResponseEntity<>(new String("Item not found!"), HttpStatus.NOT_FOUND);
+		}
+		
+		clientCart.addItem(itemExists.getProduct(), itemExists.getUnitPrice(), itemExists.getQuantity());
+		
+		this.factory.getShoppingCartRepository().save(clientCart);
+		
+		return new ResponseEntity<>(productExists, HttpStatus.OK);
+	}
+	
 }
