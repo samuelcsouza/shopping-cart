@@ -7,5 +7,5 @@ import br.com.geofusion.cart.models.ShoppingCart;
 
 @Repository
 public interface ShoppingCartRepository extends JpaRepository<ShoppingCart, Long> {
-
+	ShoppingCart findByClientId(String clientId);
 }

@@ -23,7 +23,7 @@ public class Item {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToOne()
+	@OneToOne
 	@JoinColumn(name = "code")
 	private Product product;
 	
@@ -97,5 +97,13 @@ public class Item {
 	
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public void setUnitPrice(BigDecimal unitPrice) {
+		this.unitPrice = unitPrice;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 }
