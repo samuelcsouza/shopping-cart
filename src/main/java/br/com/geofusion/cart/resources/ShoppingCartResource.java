@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -81,4 +82,18 @@ public class ShoppingCartResource {
 		return new ResponseEntity<>(productExists, HttpStatus.OK);
 	}
 	
+	@GetMapping(path = "/{clientId}/average-ticket-amount")
+	public ResponseEntity<Object> getAverageTicketAmount(@PathVariable String clientId){
+		return new ResponseEntity<>(this.factory.getAverageTicketAmount(), HttpStatus.OK);
+	}
+	
+	@DeleteMapping(path = "/{clientId}")
+	public ResponseEntity<Object> invalidateCart(@PathVariable String clientId){
+		boolean isDeleted = this.factory.invalidate(clientId);
+		
+		if( isDeleted )
+			return new ResponseEntity<>(new String("Cart deleted!"), HttpStatus.OK);
+		
+		return new ResponseEntity<>(new String("Cart not exists"), HttpStatus.NOT_FOUND);
+	}
 }
