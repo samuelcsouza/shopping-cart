@@ -52,11 +52,15 @@ public class ShoppingCartFactory {
          if (allCarts.isEmpty()) {
              return new BigDecimal(0);
          }
-         BigDecimal result = allCarts
-                 .stream()
-                 .reduce(new BigDecimal(0), (sum, ob) -> sum.add(ob.getAmount()), BigDecimal::add);
-
-         return result.divide(new BigDecimal(allCarts.size()), RoundingMode.HALF_UP);
+         
+         BigDecimal total = new BigDecimal(0);
+         BigDecimal allCartsCount = new BigDecimal(allCarts.size());
+         
+         for (ShoppingCart shoppingCart : allCarts) {
+			total = total.add(shoppingCart.getAmount());
+		}
+         
+         return total.divide(allCartsCount, RoundingMode.HALF_UP);         
     }
 
     /**
@@ -70,6 +74,7 @@ public class ShoppingCartFactory {
     public boolean invalidate(String clientId) {
         ShoppingCart clientCart = this.shoppingCartRepository.findByClientId(clientId);
         
+        
         if( clientCart == null ) {
         	return false;
         }
@@ -78,10 +83,7 @@ public class ShoppingCartFactory {
     }
     
     public void updateCart(ShoppingCart newShoppingCart) {
-    	
     	try {
-	    	ShoppingCart existisShoppingCart = this.shoppingCartRepository.findByClientId(newShoppingCart.getClientId());
-	    	this.shoppingCartRepository.delete(existisShoppingCart);
 	    	this.shoppingCartRepository.save(newShoppingCart);
     	} catch (Exception e) {
     		throw new RuntimeException("not update");

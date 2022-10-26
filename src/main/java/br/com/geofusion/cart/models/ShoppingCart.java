@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 /**
  * Classe que representa o carrinho de compras de um cliente.
@@ -28,11 +29,10 @@ public class ShoppingCart {
 	@Column(name = "clientId")
 	private String clientId;
 
-	@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "Item_Cart", joinColumns = @JoinColumn(name = "cartId", insertable = false, updatable = false), inverseJoinColumns = @JoinColumn(name = "id", insertable = false, updatable = false))
+	@OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = false)
 	private List<Item> items;
 	
-	@ManyToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.PERSIST)
 	private List<Item> allItems;
 
 	/**
@@ -181,10 +181,6 @@ public class ShoppingCart {
 	public void setItems(List<Item> items) {
 		this.items = items;
 	}
-
-//	public Long getCartId() {
-//		return cartId;
-//	}
 
 	public void setAllItems(List<Item> allItems) {
 		this.allItems = allItems;
