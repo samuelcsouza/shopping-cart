@@ -29,10 +29,11 @@ public class ShoppingCart {
 	@Column(name = "clientId")
 	private String clientId;
 
-	@OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = false)
+	@ManyToMany(cascade = CascadeType.PERSIST)
+	@JoinTable(name = "Item_Cart", joinColumns = @JoinColumn(name = "cartId", insertable = false, updatable = true), inverseJoinColumns = @JoinColumn(name = "id", insertable = false, updatable = true))
 	private List<Item> items;
 	
-	@OneToMany(cascade = CascadeType.PERSIST)
+	@ManyToMany(cascade = CascadeType.PERSIST)
 	private List<Item> allItems;
 
 	/**

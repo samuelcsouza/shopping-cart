@@ -32,6 +32,9 @@ public class Item {
 	
 	@Column(name = "quantity")
 	private int quantity;
+	
+	@ManyToMany
+	private List<ShoppingCart> shoppingCart = new ArrayList<>();
 
 	/**
      * Construtor da classe Item.
