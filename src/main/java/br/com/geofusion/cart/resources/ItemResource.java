@@ -31,8 +31,12 @@ public class ItemResource {
 	}
 	
 	@PostMapping
-	public ResponseEntity<Item> save(@RequestBody Item item){
-		
+	public ResponseEntity<Object> save(@RequestBody Item item){
+		for (Item itemAlreadyExists : this.itemRepository.findAll()) {
+			if( itemAlreadyExists.getProduct().getCode() == item.getProduct().getCode())
+				return new ResponseEntity<>(new String("Item already exists!"), HttpStatus.CONFLICT);
+		}
+
 		this.itemRepository.save(item);
 		return new ResponseEntity<>(item, HttpStatus.CREATED);
 	}
