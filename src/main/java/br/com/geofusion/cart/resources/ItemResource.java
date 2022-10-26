@@ -1,6 +1,5 @@
 package br.com.geofusion.cart.resources;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -23,73 +22,66 @@ import br.com.geofusion.cart.repositories.ItemRepository;
 @RestController
 @RequestMapping(path = "/item")
 public class ItemResource {
-	
+
 	private ItemRepository itemRepository;
-	
+
 	public ItemResource(ItemRepository itemRepository) {
 		this.itemRepository = itemRepository;
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<Object> save(@RequestBody Item item){
+	public ResponseEntity<Object> save(@RequestBody Item item) {
 		for (Item itemAlreadyExists : this.itemRepository.findAll()) {
-			if( itemAlreadyExists.getProduct().getCode() == item.getProduct().getCode())
+			if (itemAlreadyExists.getProduct().getCode() == item.getProduct().getCode())
 				return new ResponseEntity<>(new String("Item already exists!"), HttpStatus.CONFLICT);
 		}
 
 		this.itemRepository.save(item);
 		return new ResponseEntity<>(item, HttpStatus.CREATED);
 	}
-	
-	@GetMapping()
-	public ResponseEntity<List<Item>> listAll(){
-		List<Item> items = new ArrayList<Item>();
-		
-		items = this.itemRepository.findAll();
+
+	@GetMapping
+	public ResponseEntity<List<Item>> listAll() {
+		List<Item> items = this.itemRepository.findAll();
 		return new ResponseEntity<>(items, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(path = "/{id}")
-	public ResponseEntity<Optional<Item>> getById(@PathVariable Long id){
+	public ResponseEntity<Object> getById(@PathVariable Long id) {
 		Optional<Item> item;
-		
+
 		try {
 			item = this.itemRepository.findById(id);
 		} catch (NoSuchElementException e) {
-			return new ResponseEntity<Optional<Item>>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new String("Item not found!"), HttpStatus.NOT_FOUND);
 		}
-		
-		if (item.isEmpty())
-			return new ResponseEntity<Optional<Item>>(HttpStatus.NOT_FOUND);
-		
-		return new ResponseEntity<Optional<Item>>(item, HttpStatus.OK);
-		
+
+		if (item.isEmpty()) {
+			return new ResponseEntity<>(new String("Item not found!"), HttpStatus.NOT_FOUND);
+		}
+
+		return new ResponseEntity<>(item, HttpStatus.OK);
 	}
-	
+
 	@DeleteMapping(path = "/{id}")
-	public ResponseEntity<Optional<Item>> deleteById(@PathVariable Long id){
+	public ResponseEntity<Object> deleteById(@PathVariable Long id) {
 		try {
 			this.itemRepository.deleteById(id);
-			return new ResponseEntity<Optional<Item>>(HttpStatus.OK);
+			return new ResponseEntity<>(new String("Item deleted!"), HttpStatus.OK);
 		} catch (NoSuchElementException e) {
-			return new ResponseEntity<Optional<Item>>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new String("Item not found!"), HttpStatus.NOT_FOUND);
 		}
 	}
-	
+
 	@PutMapping(path = "/{id}")
-	public ResponseEntity<Item> update(@PathVariable Long id, @RequestBody Item newItem){		
-		return this.itemRepository.findById(id)
-				.map(item -> {
-					item = new Item(
-							new Product(
-									item.getProduct().getCode(),
-									item.getProduct().getDescription()),
-							newItem.getUnitPrice(),
-							item.getQuantity());
-					item.setId(id);
-					Item itemUpdated = this.itemRepository.save(item);
-					return ResponseEntity.ok().body(itemUpdated);
-				}).orElse(ResponseEntity.notFound().build());
+	public ResponseEntity<Item> update(@PathVariable Long id, @RequestBody Item newItem) {
+		return this.itemRepository.findById(id).map(item -> {
+			item = new Item(new Product(item.getProduct().getCode(), item.getProduct().getDescription()),
+					newItem.getUnitPrice(), item.getQuantity());
+			item.setId(id);
+			Item itemUpdated = this.itemRepository.save(item);
+			return ResponseEntity.ok().body(itemUpdated);
+		}).orElse(ResponseEntity.notFound().build());
 	}
 
 }

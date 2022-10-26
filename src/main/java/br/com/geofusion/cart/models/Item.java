@@ -26,75 +26,74 @@ public class Item {
 	@OneToOne
 	@JoinColumn(name = "code")
 	private Product product;
-	
+
 	@Column(name = "unitPrice")
 	private BigDecimal unitPrice;
-	
+
 	@Column(name = "quantity")
 	private int quantity;
-	
+
 	@ManyToMany
 	private List<ShoppingCart> shoppingCart = new ArrayList<>();
 
 	/**
-     * Construtor da classe Item.
-     *
-     * @param product
-     * @param unitPrice
-     * @param quantity
-     */
-    public Item(Product product, BigDecimal unitPrice, int quantity) {
-    	this.product = product;
+	 * Construtor da classe Item.
+	 *
+	 * @param product
+	 * @param unitPrice
+	 * @param quantity
+	 */
+	public Item(Product product, BigDecimal unitPrice, int quantity) {
+		this.product = product;
 		this.unitPrice = unitPrice;
 		this.quantity = quantity;
-    }
-    
-    public Item() {}
+	}
 
-    /**
-     * Retorna o produto.
-     *
-     * @return Produto
-     */
-    public Product getProduct() {
-        return this.product;
-    }
+	public Item() {}
 
-    /**
-     * Retorna o valor unitário do item.
-     *
-     * @return BigDecimal
-     */
-    public BigDecimal getUnitPrice() {
-        return this.unitPrice;
-    }
+	/**
+	 * Retorna o produto.
+	 *
+	 * @return Produto
+	 */
+	public Product getProduct() {
+		return this.product;
+	}
 
-    /**
-     * Retorna a quantidade dos item.
-     *
-     * @return int
-     */
-    public int getQuantity() {
-        return this.quantity;
-    }
+	/**
+	 * Retorna o valor unitário do item.
+	 *
+	 * @return BigDecimal
+	 */
+	public BigDecimal getUnitPrice() {
+		return this.unitPrice;
+	}
 
-    /**
-     * Retorna o valor total do item.
-     *
-     * @return BigDecimal
-     */
-    public BigDecimal getAmount() {
-    	BigDecimal quantity = new BigDecimal(this.quantity);
-    	
-        return quantity.multiply(this.unitPrice);
-    }
+	/**
+	 * Retorna a quantidade dos item.
+	 *
+	 * @return int
+	 */
+	public int getQuantity() {
+		return this.quantity;
+	}
 
-    /* Getters e Setters */
-    
+	/**
+	 * Retorna o valor total do item.
+	 *
+	 * @return BigDecimal
+	 */
+	public BigDecimal getAmount() {
+		BigDecimal quantity = new BigDecimal(this.quantity);
+		return quantity.multiply(this.unitPrice);
+	}
+
+	/* Getters e Setters */
+
 	public Long getId() {
 		return id;
 	}
-	
+
 	public void setId(Long id) {
 		this.id = id;
 	}
