@@ -1,7 +1,6 @@
 package br.com.geofusion.cart.models;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -14,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 
 /**
  * Classe que representa o carrinho de compras de um cliente.
@@ -32,7 +30,7 @@ public class ShoppingCart {
 	@ManyToMany(cascade = CascadeType.PERSIST)
 	@JoinTable(name = "Item_Cart", joinColumns = @JoinColumn(name = "cartId", insertable = false, updatable = true), inverseJoinColumns = @JoinColumn(name = "id", insertable = false, updatable = true))
 	private List<Item> items;
-	
+
 	@ManyToMany(cascade = CascadeType.PERSIST)
 	private List<Item> allItems;
 
@@ -47,8 +45,7 @@ public class ShoppingCart {
 		this.items = items;
 	}
 
-	public ShoppingCart() {
-	}
+	public ShoppingCart() {}
 
 	/**
 	 * Permite a adição de um novo item no carrinho de compras.
@@ -72,15 +69,14 @@ public class ShoppingCart {
 		if (existsOnAllItems == null) {
 			throw new RuntimeException("Item not found!");
 		} else {
-			
 			Item existsOnCart = this.getItemByProduct(product);
-			
+
 			if (existsOnCart == null) {
 				this.items.add(existsOnAllItems);
 			} else {
 				existsOnCart.setQuantity(existsOnCart.getQuantity() + quantity);
 				existsOnCart.setUnitPrice(unitPrice);
-				
+
 				int itemIndex = items.indexOf(existsOnCart);
 				this.items.set(itemIndex, existsOnAllItems);
 			}
@@ -96,8 +92,8 @@ public class ShoppingCart {
 	 */
 	public boolean removeItem(Product product) {
 		Item itemToRemoved = this.getItemByProduct(product);
-		
-		if( itemToRemoved == null ) {
+
+		if (itemToRemoved == null) {
 			return false;
 		} else {
 			this.items.remove(itemToRemoved);
@@ -120,7 +116,6 @@ public class ShoppingCart {
 		} catch (Exception e) {
 			return false;
 		}
-
 		return true;
 	}
 
@@ -135,7 +130,6 @@ public class ShoppingCart {
 
 		for (Item item : this.items) {
 			BigDecimal itemAmount = item.getAmount();
-
 			totalAmount = totalAmount.add(itemAmount);
 		}
 
@@ -153,16 +147,16 @@ public class ShoppingCart {
 
 	private Item getItemByProduct(Product product) {
 		for (Item item : this.items) {
-			if(product.getCode() == item.getProduct().getCode()) {
+			if (product.getCode() == item.getProduct().getCode()) {
 				return item;
 			}
 		}
 		return null;
 	}
-	
+
 	private Item getItemFromAllItems(Product product) {
 		for (Item item : this.allItems) {
-			if(product.getCode() == item.getProduct().getCode()) {
+			if (product.getCode() == item.getProduct().getCode()) {
 				return item;
 			}
 		}

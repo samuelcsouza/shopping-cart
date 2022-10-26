@@ -24,68 +24,62 @@ import br.com.geofusion.cart.repositories.ProductRepository;
 public class ProductResource {
 
 	private ProductRepository productRepository;
-	
+
 	public ProductResource(ProductRepository productRepository) {
 		this.productRepository = productRepository;
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<Object> save(@RequestBody Product product){
-		
+	public ResponseEntity<Object> save(@RequestBody Product product) {
 		Long newProductCode = product.getCode();
 		boolean alreadySaved = this.productRepository.existsById(newProductCode);
-		
+
 		if (alreadySaved) {
 			return new ResponseEntity<>(new String("The entity already created!"), HttpStatus.CONFLICT);
 		}
-		
+
 		this.productRepository.save(product);
-		
 		return new ResponseEntity<>(product, HttpStatus.CREATED);
 	}
-	
+
 	@GetMapping()
-	public ResponseEntity<List<Product>> listAll(){
-		List<Product> products = new ArrayList<Product>();
-		
-		products = this.productRepository.findAll();
+	public ResponseEntity<List<Product>> listAll() {
+		List<Product> products = this.productRepository.findAll();
 		return new ResponseEntity<>(products, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(path = "/{id}")
-	public ResponseEntity<Object> getById(@PathVariable Long id){
+	public ResponseEntity<Object> getById(@PathVariable Long id) {
 		Optional<Product> product;
-		
+
 		try {
 			product = this.productRepository.findById(id);
 		} catch (NoSuchElementException e) {
 			return new ResponseEntity<>(new String("Product not found!"), HttpStatus.NOT_FOUND);
 		}
-		
-		if (product.isEmpty())
+
+		if (product.isEmpty()) {
 			return new ResponseEntity<>(new String("Product not found!"), HttpStatus.NOT_FOUND);
-		
+		}
 		return new ResponseEntity<>(product, HttpStatus.OK);
-		
 	}
-	
+
 	@DeleteMapping(path = "/{id}")
-	public ResponseEntity<Object> deleteById(@PathVariable Long id){
+	public ResponseEntity<Object> deleteById(@PathVariable Long id) {
 		try {
 			this.productRepository.deleteById(id);
-			return new ResponseEntity<>(HttpStatus.OK);
+			return new ResponseEntity<>(new String("Product deleted!"), HttpStatus.OK);
 		} catch (NoSuchElementException nsee) {
 			return new ResponseEntity<>(new String("Product not found!"), HttpStatus.NOT_FOUND);
 		}
 	}
-	
+
 	@PutMapping(path = "/{id}")
-	public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product newProduct){
-		return this.productRepository.findById(id)
-				.map(product -> {
-					product = new Product(id, newProduct.getDescription());
-					Product productUpdated = this.productRepository.save(product);
-					return ResponseEntity.ok().body(productUpdated);
-				}).orElse(ResponseEntity.notFound().build());
+	public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product newProduct) {
+		return this.productRepository.findById(id).map(product -> {
+			product = new Product(id, newProduct.getDescription());
+			Product productUpdated = this.productRepository.save(product);
+			return ResponseEntity.ok().body(productUpdated);
+		}).orElse(ResponseEntity.notFound().build());
 	}
 }
