@@ -30,7 +30,10 @@ public class ShoppingCart {
 
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "Item_Cart", joinColumns = @JoinColumn(name = "cartId", insertable = false, updatable = false), inverseJoinColumns = @JoinColumn(name = "id", insertable = false, updatable = false))
-	private List<Item> items = new ArrayList<>();
+	private List<Item> items;
+	
+	@ManyToMany(cascade = CascadeType.ALL)
+	private List<Item> allItems;
 
 	/**
 	 * Construtor.
@@ -63,26 +66,24 @@ public class ShoppingCart {
 	 * @param quantity
 	 */
 	public void addItem(Product product, BigDecimal unitPrice, int quantity) {
-		try {
-			Item existsItem = this.getItemByProduct(product);
-			
-			if( existsItem == null ) {
-				Item newItem = new Item(product, unitPrice, quantity);
-				this.items.add(newItem);
-			} else {
-				existsItem.setQuantity(existsItem.getQuantity() + quantity);
-				existsItem.setUnitPrice(unitPrice);
-				int itemIndex = items.indexOf(existsItem);
-				
-				this.items.set(itemIndex, existsItem);
-				
-			}
-			
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		Item existsOnAllItems = this.getItemFromAllItems(product);
 
-		
+		if (existsOnAllItems == null) {
+			throw new RuntimeException("Item not found!");
+		} else {
+			
+			Item existsOnCart = this.getItemByProduct(product);
+			
+			if (existsOnCart == null) {
+				this.items.add(existsOnAllItems);
+			} else {
+				existsOnCart.setQuantity(existsOnCart.getQuantity() + quantity);
+				existsOnCart.setUnitPrice(unitPrice);
+				
+				int itemIndex = items.indexOf(existsOnCart);
+				this.items.set(itemIndex, existsOnAllItems);
+			}
+		}
 	}
 
 	/**
@@ -150,7 +151,16 @@ public class ShoppingCart {
 	}
 
 	private Item getItemByProduct(Product product) {
-		for (Item item : items) {
+		for (Item item : this.items) {
+			if(product.getCode() == item.getProduct().getCode()) {
+				return item;
+			}
+		}
+		return null;
+	}
+	
+	private Item getItemFromAllItems(Product product) {
+		for (Item item : this.allItems) {
 			if(product.getCode() == item.getProduct().getCode()) {
 				return item;
 			}
@@ -172,8 +182,12 @@ public class ShoppingCart {
 		this.items = items;
 	}
 
-	public Long getCartId() {
-		return cartId;
+//	public Long getCartId() {
+//		return cartId;
+//	}
+
+	public void setAllItems(List<Item> allItems) {
+		this.allItems = allItems;
 	}
 
 }

@@ -73,9 +73,19 @@ public class ShoppingCartFactory {
         if( clientCart == null ) {
         	return false;
         }
-        
-        this.shoppingCartRepository.deleteById(clientCart.getCartId());
+        this.shoppingCartRepository.delete(clientCart);
         return true;
+    }
+    
+    public void updateCart(ShoppingCart newShoppingCart) {
+    	
+    	try {
+	    	ShoppingCart existisShoppingCart = this.shoppingCartRepository.findByClientId(newShoppingCart.getClientId());
+	    	this.shoppingCartRepository.delete(existisShoppingCart);
+	    	this.shoppingCartRepository.save(newShoppingCart);
+    	} catch (Exception e) {
+    		throw new RuntimeException("not update");
+    	}
     }
 
     public List<ShoppingCart> listAll(){

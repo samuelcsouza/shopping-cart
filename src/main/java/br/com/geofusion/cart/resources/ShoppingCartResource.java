@@ -57,6 +57,7 @@ public class ShoppingCartResource {
 	@PostMapping(path = "/{clientId}")
 	public ResponseEntity<Object> addItem(@PathVariable String clientId, @RequestBody Product product){
 		ShoppingCart clientCart = this.factory.create(clientId);
+		clientCart.setAllItems(this.itemRepository.findAll());
 		
 		Product productExists = this.productRepository.findById(product.getCode()).orElse(null);
 		if( productExists == null ) {
@@ -75,11 +76,11 @@ public class ShoppingCartResource {
 			return new ResponseEntity<>(new String("Item not found!"), HttpStatus.NOT_FOUND);
 		}
 		
-		clientCart.addItem(itemExists.getProduct(), itemExists.getUnitPrice(), itemExists.getQuantity());
+		clientCart.addItem(productExists, itemExists.getUnitPrice(), itemExists.getQuantity());
 		
-		this.factory.getShoppingCartRepository().save(clientCart);
+		this.factory.updateCart(clientCart);
 		
-		return new ResponseEntity<>(productExists, HttpStatus.OK);
+		return new ResponseEntity<>(clientCart, HttpStatus.OK);
 	}
 	
 	@GetMapping(path = "/{clientId}/average-ticket-amount")
