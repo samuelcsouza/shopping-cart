@@ -83,7 +83,7 @@ public class ShoppingCartResource {
 		return new ResponseEntity<>(clientCart, HttpStatus.OK);
 	}
 	
-	@GetMapping(path = "/{clientId}/average-ticket-amount")
+	@GetMapping(path = "/average-ticket-amount")
 	public ResponseEntity<Object> getAverageTicketAmount(@PathVariable String clientId){
 		return new ResponseEntity<>(this.factory.getAverageTicketAmount(), HttpStatus.OK);
 	}
