@@ -1,6 +1,8 @@
 package br.com.geofusion.cart.models;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 
 /**
@@ -20,19 +23,18 @@ public class Item {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToOne()
+	@OneToOne
 	@JoinColumn(name = "code")
 	private Product product;
 	
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	@Column(name = "unitPrice")
 	private BigDecimal unitPrice;
 	
 	@Column(name = "quantity")
 	private int quantity;
+	
+	@ManyToMany
+	private List<ShoppingCart> shoppingCart = new ArrayList<>();
 
 	/**
      * Construtor da classe Item.
@@ -47,9 +49,7 @@ public class Item {
 		this.quantity = quantity;
     }
     
-    public Item() {
-    	
-    }
+    public Item() {}
 
     /**
      * Retorna o produto.
@@ -89,7 +89,21 @@ public class Item {
         return quantity.multiply(this.unitPrice);
     }
 
+    /* Getters e Setters */
+    
 	public Long getId() {
 		return id;
+	}
+	
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setUnitPrice(BigDecimal unitPrice) {
+		this.unitPrice = unitPrice;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 }
